@@ -1,12 +1,12 @@
 import * as dotenv from "dotenv";
+
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
-//import { userRoute } from "./routes/userRoutes.js";
+import { titleRoute } from "./routes/titleRoutes.js";
 import errorHandler from "./middleware/errorMiddleware.js";
-//import { messageRoute } from "./routes/messageRoutes.js";
-//import { conversationRoute } from "./routes/conversationRoutes.js";
+import fileUpload from "express-fileupload";
 
 dotenv.config();
 
@@ -14,6 +14,11 @@ connectDB();
 
 const app = express();
 app.use(cors());
+app.use(
+  fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+  })
+);
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
   bodyParser.urlencoded({
@@ -29,7 +34,7 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 
-// app.use("/api/users", userRoute);
+app.use("/api", titleRoute);
 // app.use("/api/message", messageRoute);
 // app.use("/api/conversation", conversationRoute);
 
