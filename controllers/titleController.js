@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import srtParser2 from "srt-parser-2";
+import fs from "fs";
 import { Movie } from "../models/movieModel.js";
 import mongoose from "mongoose";
 
@@ -7,6 +8,7 @@ var parser = new srtParser2();
 export const parseFile = asyncHandler(async (req, res) => {
   const file1 = req.files.undefined[0].data.toString("utf8");
   const file2 = req.files.undefined[1].data.toString("utf8");
+  const title = req.files.undefined[1].name;
   const srt_array1 = parser.fromSrt(file1);
   const srt_array2 = parser.fromSrt(file2);
   const merged_array = [...srt_array1, ...srt_array2].reduce(
@@ -31,7 +33,7 @@ export const parseFile = asyncHandler(async (req, res) => {
   );
 
   const movie = await Movie.create({
-    title: "test",
+    title,
     status: 0,
     subs: merged_array,
   });
@@ -44,7 +46,8 @@ export const parseFile = asyncHandler(async (req, res) => {
 });
 
 export const editSub = asyncHandler(async (req, res) => {
-  const { subId, text, movieId } = req.body;
+  const movieId = req.params.movieId;
+  const { subId, text } = req.body;
   const movie = await Movie.findOneAndUpdate(
     { _id: movieId, "subs.id": subId },
     {
@@ -82,4 +85,47 @@ export const editSub = asyncHandler(async (req, res) => {
       }
     }
   }
+});
+
+export const downloadSub = asyncHandler(async (req, res) => {
+  const movieId = req.params.movieId;
+  const { status } = req.body;
+
+  if (Number(status) !== 1) {
+    res.status(400);
+    throw new Error("Film nije u potpunosti preveden");
+  }
+  const movie = await Movie.find(
+    { _id: new mongoose.Types.ObjectId(movieId), status: Number(status) },
+    { subs: 1, title: 1, _id: 0 }
+  );
+
+  const subs = movie[0].subs;
+  const movieName = movie[0].title;
+  subs.forEach((sub) => {
+    delete sub["text"];
+    delete sub["text2"];
+    sub["text"] = sub["text3"];
+    delete sub["text3"];
+  });
+
+  const srt_string = parser.toSrt(subs);
+
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${movieName}.srt"`
+  );
+
+  res.type("text/srt").send(srt_string);
+
+  // const filePath = `${movieName}.srt`;
+
+  // // Write the SRT string to a file
+  // fs.writeFile(filePath, srt_string, (err) => {
+  //   if (err) {
+  //     console.error("Error writing SRT file:", err);
+  //   } else {
+  //     console.log("SRT file created successfully.");
+  //   }
+  // });
 });
