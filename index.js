@@ -35,8 +35,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", titleRoute);
-// app.use("/api/message", messageRoute);
-// app.use("/api/conversation", conversationRoute);
 
 app.use(errorHandler);
 

@@ -111,10 +111,7 @@ export const downloadSub = asyncHandler(async (req, res) => {
 
   const srt_string = parser.toSrt(subs);
 
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename="${movieName}.srt"`
-  );
+  res.setHeader("Content-Disposition", `attachment; filename="${movieName}"`);
 
   res.type("text/srt").send(srt_string);
 
