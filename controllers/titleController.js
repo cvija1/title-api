@@ -93,7 +93,7 @@ export const editSub = asyncHandler(async (req, res) => {
 
 export const downloadSub = asyncHandler(async (req, res) => {
   const movieId = req.params.movieId;
-  const { status } = req.body;
+  const status = req.query.status;
 
   if (Number(status) !== 1) {
     res.status(400);
