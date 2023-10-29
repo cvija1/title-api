@@ -6,9 +6,13 @@ import mongoose from "mongoose";
 
 var parser = new srtParser2();
 export const parseFile = asyncHandler(async (req, res) => {
-  const file1 = req.files.undefined[0].data.toString("utf8");
-  const file2 = req.files.undefined[1].data.toString("utf8");
-  const title = req.files.undefined[1].name;
+  console.log(req.files);
+  const fileOneKey = Object.keys(req.files)[0];
+  const fileTwoKey = Object.keys(req.files)[1];
+
+  const file1 = req.files[fileOneKey].data.toString("utf8");
+  const file2 = req.files[fileTwoKey].data.toString("utf8");
+  const title = req.files[fileOneKey].name;
   const srt_array1 = parser.fromSrt(file1);
   const srt_array2 = parser.fromSrt(file2);
   const merged_array = [...srt_array1, ...srt_array2].reduce(
