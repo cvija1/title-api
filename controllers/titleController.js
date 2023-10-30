@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 
 var parser = new srtParser2();
 export const parseFile = asyncHandler(async (req, res) => {
-  console.log(req.files);
   const fileOneKey = Object.keys(req.files)[0];
   const fileTwoKey = Object.keys(req.files)[1];
 
@@ -117,7 +116,7 @@ export const downloadSub = asyncHandler(async (req, res) => {
 
   res.setHeader("Content-Disposition", `attachment; filename="${movieName}"`);
 
-  res.type("text/srt").send(srt_string);
+  res.type("text/srt").status(201).json({ title: movieName, srt_string });
 
   // const filePath = `${movieName}.srt`;
 
